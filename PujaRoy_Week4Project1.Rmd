@@ -1,0 +1,129 @@
+---
+title: "Project 1: Data Analysis"
+author: "Puja Roy"
+date: "`r Sys.Date()`"
+output: openintro::lab_report
+---
+
+### Introduction
+The goal of this project is to create an R Markdown file that generates a .CSV file containing all of the information for all of the chess players.
+
+### Import the Libraries
+```{r load-packages, message=FALSE}
+library(tidyverse)
+library(openintro)
+```
+
+### Load the data
+```{r}
+# Read the text file
+data <- read_lines("https://raw.githubusercontent.com/pujaroy280/DATA607Project1/main/tournamentinfo.txt", skip=4)
+#print(data)
+
+```
+
+### Clean & Transform the Data
+
+I cleaned and transformed the data by deleting the divider lines and extracting the values into a dataframe. I also worked on categorizing the dataframe into even and odd rows and later merging the dataframes by each column.
+```{r}
+dividers <- which(grepl("^-", data))
+data_transformed <- data[-dividers]
+```
+
+```{r}
+data <- read.table(text = data_transformed, sep = "|", col.names = c("Pair", "Name", "Points", "R1", "R2", "R3", "R4", "R5", "R6", "R7", "NA"))
+data <- data[1:(length(data) - 1)]
+```
+
+```{r}
+row_1 <- data %>% filter(row_number() %%2 == 1)
+row_2 <- data %>% filter(row_number() %%2 == 0)
+data_w <- cbind(row_1, row_2)
+colnames(data_w) = c("Pair", "Name", "Points", "R1", "R2", "R3", "R4", "R5", "R6", "R7", "State", "ID_Rating", "Points_2", "R1_2", "R2_2", "R3_2", "R4_2", "R5_2", "R6_2", "R7_2")
+```
+
+I leveraged Regex to create new columns of each round to identify Wins, Losses or Draws and likewise for the column pre_ratings.
+```{r}
+data_w <- data_w %>%
+  separate_wider_regex(
+    c(R1:R7),
+    patterns = c(
+      "[BDHLUWX] {2,4}",
+      # Create new columns by extracting data using Regex expressions to identify Wins, Losses and Draws from Rounds 1-7.
+      opponent_ID = "(?:\\d+)?"
+    ),
+     # Include new colums to identify which Rounds in the chess game had Wins, Losses or Draws
+    names_sep = "_"
+  )
+```
+
+```{r}
+data_w <- data_w %>%
+  separate_wider_regex(
+    ID_Rating,
+    patterns = c(
+      " \\d{8} / R: +",
+      pre_ratings = "\\d+",
+      "[ P0-9]*-> *",
+      "\\d+[ P0-9]*"
+    )
+  )
+```
+
+```{r}
+# Replace missing values with NA
+data_w <- replace(data_w, data_w=='', NA)
+```
+
+```{r}
+data_w$pre_ratings <- as.numeric(data_w$pre_ratings)
+```
+
+```{r}
+data_w$Pair <- str_trim(data_w$Pair)
+```
+
+### Update the data by Calculating average pre-rating of opponents
+
+Once the data was cleaned and transformed, I calculated the average pre-rating of each player’s opponents.
+```{r}
+pre_ratings_updated <- data_w$pre_ratings
+names(pre_ratings_updated) <- data_w$Pair
+```
+
+```{r}
+data_w <- data_w %>%
+  rowwise %>%  
+  mutate(
+      total_opponent_pre_ratings = sum(across(
+            .cols = ends_with("_opponent_ID"),
+            .fns = ~ unname(pre_ratings_updated[.x])),
+          na.rm = TRUE),
+      
+      num_of_opponents = sum(across(
+            .cols = ends_with("_opponent_ID"),
+            .fns = ~ !is.na(.x))),
+      
+      average_opponent_pre_rating = ifelse(num_of_opponents == 0, NA, 
+                                           floor(total_opponent_pre_ratings / num_of_opponents))
+  )
+```
+
+### Verify the complete results of tranformed data
+
+Before converting the file into a CSV file, I organized the data by sorting the data by total points and after that pre_ratings in descending order. 
+```{r}
+complete_results <- data_w %>% 
+  select(Name, State, Points, pre_ratings, average_opponent_pre_rating) %>%
+  arrange(desc(Points), desc(pre_ratings))
+```
+
+### Convert dataset into a CSV file
+I converted the complete_results data into a CSV file.
+```{r}
+write.csv(complete_results, file='tournamentinfo_updatedsummary.csv', row.names = FALSE, quote = FALSE)
+```
+
+### Conclusion
+
+Throughout this project, I learned how to load, extract, clean and transform and convert data into a CSV file.
