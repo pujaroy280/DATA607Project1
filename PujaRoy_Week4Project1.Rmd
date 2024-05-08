@@ -18,8 +18,7 @@ library(openintro)
 ```{r}
 # Read the text file
 data <- read_lines("https://raw.githubusercontent.com/pujaroy280/DATA607Project1/main/tournamentinfo.txt", skip=4)
-#print(data)
-
+head(data)
 ```
 
 ### Clean & Transform the Data
@@ -33,6 +32,7 @@ data_transformed <- data[-dividers]
 ```{r}
 data <- read.table(text = data_transformed, sep = "|", col.names = c("Pair", "Name", "Points", "R1", "R2", "R3", "R4", "R5", "R6", "R7", "NA"))
 data <- data[1:(length(data) - 1)]
+print(data)
 ```
 
 ```{r}
@@ -40,6 +40,7 @@ row_1 <- data %>% filter(row_number() %%2 == 1)
 row_2 <- data %>% filter(row_number() %%2 == 0)
 data_w <- cbind(row_1, row_2)
 colnames(data_w) = c("Pair", "Name", "Points", "R1", "R2", "R3", "R4", "R5", "R6", "R7", "State", "ID_Rating", "Points_2", "R1_2", "R2_2", "R3_2", "R4_2", "R5_2", "R6_2", "R7_2")
+print(data_w)
 ```
 
 I leveraged Regex to create new columns of each round to identify Wins, Losses or Draws and likewise for the column pre_ratings.
@@ -55,6 +56,7 @@ data_w <- data_w %>%
      # Include new colums to identify which Rounds in the chess game had Wins, Losses or Draws
     names_sep = "_"
   )
+print(data_w)
 ```
 
 ```{r}
@@ -68,11 +70,13 @@ data_w <- data_w %>%
       "\\d+[ P0-9]*"
     )
   )
+print(data_w)
 ```
 
 ```{r}
 # Replace missing values with NA
 data_w <- replace(data_w, data_w=='', NA)
+print(data_w)
 ```
 
 ```{r}
@@ -89,6 +93,7 @@ Once the data was cleaned and transformed, I calculated the average pre-rating o
 ```{r}
 pre_ratings_updated <- data_w$pre_ratings
 names(pre_ratings_updated) <- data_w$Pair
+print(pre_ratings_updated)
 ```
 
 ```{r}
@@ -100,13 +105,12 @@ data_w <- data_w %>%
             .fns = ~ unname(pre_ratings_updated[.x])),
           na.rm = TRUE),
       
-      num_of_opponents = sum(across(
-            .cols = ends_with("_opponent_ID"),
-            .fns = ~ !is.na(.x))),
+      num_of_rounds = ncol(select(data_w, starts_with("R"))), # Count the number of rounds
       
-      average_opponent_pre_rating = ifelse(num_of_opponents == 0, NA, 
-                                           floor(total_opponent_pre_ratings / num_of_opponents))
+      average_opponent_pre_rating = ifelse(num_of_rounds == 0, NA, 
+                                           floor(total_opponent_pre_ratings / 7)) # Divide by 7 to get the average
   )
+print(data_w)
 ```
 
 ### Verify the complete results of tranformed data
@@ -122,6 +126,13 @@ complete_results <- data_w %>%
 I converted the complete_results data into a CSV file.
 ```{r}
 write.csv(complete_results, file='tournamentinfo_updatedsummary.csv', row.names = FALSE, quote = FALSE)
+```
+
+### View the results
+```{r}
+# Read the text file
+results_data <- read_lines("https://raw.githubusercontent.com/pujaroy280/DATA607Project1/main/tournamentinfo_updatedsummary.csv")
+print(results_data)
 ```
 
 ### Conclusion

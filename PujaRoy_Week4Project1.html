@@ -11,7 +11,7 @@
 
 <meta name="author" content="Puja Roy" />
 
-<meta name="date" content="2024-02-18" />
+<meta name="date" content="2024-05-08" />
 
 <title>Project 1: Data Analysis</title>
 
@@ -1694,7 +1694,7 @@ border-radius: 0px;
 
 <h1 class="title toc-ignore">Project 1: Data Analysis</h1>
 <h4 class="author">Puja Roy</h4>
-<h4 class="date">2024-02-18</h4>
+<h4 class="date">2024-05-08</h4>
 
 </div>
 
@@ -1714,7 +1714,13 @@ chess players.</p>
 <h3>Load the data</h3>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># Read the text file</span></span>
 <span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">read_lines</span>(<span class="st">&quot;https://raw.githubusercontent.com/pujaroy280/DATA607Project1/main/tournamentinfo.txt&quot;</span>, <span class="at">skip=</span><span class="dv">4</span>)</span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="co">#print(data)</span></span></code></pre></div>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="fu">head</span>(data)</span></code></pre></div>
+<pre><code>## [1] &quot;    1 | GARY HUA                        |6.0  |W  39|W  21|W  18|W  14|W   7|D  12|D   4|&quot;
+## [2] &quot;   ON | 15445895 / R: 1794   -&gt;1817     |N:2  |W    |B    |W    |B    |W    |B    |W    |&quot;
+## [3] &quot;-----------------------------------------------------------------------------------------&quot;
+## [4] &quot;    2 | DAKSHESH DARURI                 |6.0  |W  63|W  58|L   4|W  17|W  16|W  20|W   7|&quot;
+## [5] &quot;   MI | 14598900 / R: 1553   -&gt;1663     |N:2  |B    |W    |B    |W    |B    |W    |B    |&quot;
+## [6] &quot;-----------------------------------------------------------------------------------------&quot;</code></pre>
 </div>
 <div id="clean-transform-the-data" class="section level3">
 <h3>Clean &amp; Transform the Data</h3>
@@ -1722,77 +1728,688 @@ chess players.</p>
 extracting the values into a dataframe. I also worked on categorizing
 the dataframe into even and odd rows and later merging the dataframes by
 each column.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>dividers <span class="ot">&lt;-</span> <span class="fu">which</span>(<span class="fu">grepl</span>(<span class="st">&quot;^-&quot;</span>, data))</span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>data_transformed <span class="ot">&lt;-</span> data[<span class="sc">-</span>dividers]</span></code></pre></div>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">read.table</span>(<span class="at">text =</span> data_transformed, <span class="at">sep =</span> <span class="st">&quot;|&quot;</span>, <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">&quot;Pair&quot;</span>, <span class="st">&quot;Name&quot;</span>, <span class="st">&quot;Points&quot;</span>, <span class="st">&quot;R1&quot;</span>, <span class="st">&quot;R2&quot;</span>, <span class="st">&quot;R3&quot;</span>, <span class="st">&quot;R4&quot;</span>, <span class="st">&quot;R5&quot;</span>, <span class="st">&quot;R6&quot;</span>, <span class="st">&quot;R7&quot;</span>, <span class="st">&quot;NA&quot;</span>))</span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>data <span class="ot">&lt;-</span> data[<span class="dv">1</span><span class="sc">:</span>(<span class="fu">length</span>(data) <span class="sc">-</span> <span class="dv">1</span>)]</span></code></pre></div>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>row_1 <span class="ot">&lt;-</span> data <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="fu">row_number</span>() <span class="sc">%%</span><span class="dv">2</span> <span class="sc">==</span> <span class="dv">1</span>)</span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>row_2 <span class="ot">&lt;-</span> data <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="fu">row_number</span>() <span class="sc">%%</span><span class="dv">2</span> <span class="sc">==</span> <span class="dv">0</span>)</span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>data_w <span class="ot">&lt;-</span> <span class="fu">cbind</span>(row_1, row_2)</span>
-<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="fu">colnames</span>(data_w) <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;Pair&quot;</span>, <span class="st">&quot;Name&quot;</span>, <span class="st">&quot;Points&quot;</span>, <span class="st">&quot;R1&quot;</span>, <span class="st">&quot;R2&quot;</span>, <span class="st">&quot;R3&quot;</span>, <span class="st">&quot;R4&quot;</span>, <span class="st">&quot;R5&quot;</span>, <span class="st">&quot;R6&quot;</span>, <span class="st">&quot;R7&quot;</span>, <span class="st">&quot;State&quot;</span>, <span class="st">&quot;ID_Rating&quot;</span>, <span class="st">&quot;Points_2&quot;</span>, <span class="st">&quot;R1_2&quot;</span>, <span class="st">&quot;R2_2&quot;</span>, <span class="st">&quot;R3_2&quot;</span>, <span class="st">&quot;R4_2&quot;</span>, <span class="st">&quot;R5_2&quot;</span>, <span class="st">&quot;R6_2&quot;</span>, <span class="st">&quot;R7_2&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>dividers <span class="ot">&lt;-</span> <span class="fu">which</span>(<span class="fu">grepl</span>(<span class="st">&quot;^-&quot;</span>, data))</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>data_transformed <span class="ot">&lt;-</span> data[<span class="sc">-</span>dividers]</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">read.table</span>(<span class="at">text =</span> data_transformed, <span class="at">sep =</span> <span class="st">&quot;|&quot;</span>, <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">&quot;Pair&quot;</span>, <span class="st">&quot;Name&quot;</span>, <span class="st">&quot;Points&quot;</span>, <span class="st">&quot;R1&quot;</span>, <span class="st">&quot;R2&quot;</span>, <span class="st">&quot;R3&quot;</span>, <span class="st">&quot;R4&quot;</span>, <span class="st">&quot;R5&quot;</span>, <span class="st">&quot;R6&quot;</span>, <span class="st">&quot;R7&quot;</span>, <span class="st">&quot;NA&quot;</span>))</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>data <span class="ot">&lt;-</span> data[<span class="dv">1</span><span class="sc">:</span>(<span class="fu">length</span>(data) <span class="sc">-</span> <span class="dv">1</span>)]</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="fu">print</span>(data)</span></code></pre></div>
+<pre><code>##       Pair                              Name Points    R1    R2    R3    R4
+## 1       1   GARY HUA                          6.0   W  39 W  21 W  18 W  14
+## 2      ON   15445895 / R: 1794   -&gt;1817       N:2   W     B     W     B    
+## 3       2   DAKSHESH DARURI                   6.0   W  63 W  58 L   4 W  17
+## 4      MI   14598900 / R: 1553   -&gt;1663       N:2   B     W     B     W    
+## 5       3   ADITYA BAJAJ                      6.0   L   8 W  61 W  25 W  21
+## 6      MI   14959604 / R: 1384   -&gt;1640       N:2   W     B     W     B    
+## 7       4   PATRICK H SCHILLING               5.5   W  23 D  28 W   2 W  26
+## 8      MI   12616049 / R: 1716   -&gt;1744       N:2   W     B     W     B    
+## 9       5   HANSHI ZUO                        5.5   W  45 W  37 D  12 D  13
+## 10     MI   14601533 / R: 1655   -&gt;1690       N:2   B     W     B     W    
+## 11      6   HANSEN SONG                       5.0   W  34 D  29 L  11 W  35
+## 12     OH   15055204 / R: 1686   -&gt;1687       N:3   W     B     W     B    
+## 13      7   GARY DEE SWATHELL                 5.0   W  57 W  46 W  13 W  11
+## 14     MI   11146376 / R: 1649   -&gt;1673       N:3   W     B     W     B    
+## 15      8   EZEKIEL HOUGHTON                  5.0   W   3 W  32 L  14 L   9
+## 16     MI   15142253 / R: 1641P17-&gt;1657P24    N:3   B     W     B     W    
+## 17      9   STEFANO LEE                       5.0   W  25 L  18 W  59 W   8
+## 18     ON   14954524 / R: 1411   -&gt;1564       N:2   W     B     W     B    
+## 19     10   ANVIT RAO                         5.0   D  16 L  19 W  55 W  31
+## 20     MI   14150362 / R: 1365   -&gt;1544       N:3   W     W     B     B    
+## 21     11   CAMERON WILLIAM MC LEMAN          4.5   D  38 W  56 W   6 L   7
+## 22     MI   12581589 / R: 1712   -&gt;1696       N:3   B     W     B     W    
+## 23     12   KENNETH J TACK                    4.5   W  42 W  33 D   5 W  38
+## 24     MI   12681257 / R: 1663   -&gt;1670       N:3   W     B     W     B    
+## 25     13   TORRANCE HENRY JR                 4.5   W  36 W  27 L   7 D   5
+## 26     MI   15082995 / R: 1666   -&gt;1662       N:3   B     W     B     B    
+## 27     14   BRADLEY SHAW                      4.5   W  54 W  44 W   8 L   1
+## 28     MI   10131499 / R: 1610   -&gt;1618       N:3   W     B     W     W    
+## 29     15   ZACHARY JAMES HOUGHTON            4.5   D  19 L  16 W  30 L  22
+## 30     MI   15619130 / R: 1220P13-&gt;1416P20    N:3   B     B     W     W    
+## 31     16   MIKE NIKITIN                      4.0   D  10 W  15 H     W  39
+## 32     MI   10295068 / R: 1604   -&gt;1613       N:3   B     W           B    
+## 33     17   RONALD GRZEGORCZYK                4.0   W  48 W  41 L  26 L   2
+## 34     MI   10297702 / R: 1629   -&gt;1610       N:3   W     B     W     B    
+## 35     18   DAVID SUNDEEN                     4.0   W  47 W   9 L   1 W  32
+## 36     MI   11342094 / R: 1600   -&gt;1600       N:3   B     W     B     W    
+## 37     19   DIPANKAR ROY                      4.0   D  15 W  10 W  52 D  28
+## 38     MI   14862333 / R: 1564   -&gt;1570       N:3   W     B     W     B    
+## 39     20   JASON ZHENG                       4.0   L  40 W  49 W  23 W  41
+## 40     MI   14529060 / R: 1595   -&gt;1569       N:4   W     B     W     B    
+## 41     21   DINH DANG BUI                     4.0   W  43 L   1 W  47 L   3
+## 42     ON   15495066 / R: 1563P22-&gt;1562       N:3   B     W     B     W    
+## 43     22   EUGENE L MCCLURE                  4.0   W  64 D  52 L  28 W  15
+## 44     MI   12405534 / R: 1555   -&gt;1529       N:4   W     B     W     B    
+## 45     23   ALAN BUI                          4.0   L   4 W  43 L  20 W  58
+## 46     ON   15030142 / R: 1363   -&gt;1371             B     W     B     W    
+## 47     24   MICHAEL R ALDRICH                 4.0   L  28 L  47 W  43 L  25
+## 48     MI   13469010 / R: 1229   -&gt;1300       N:4   B     W     B     B    
+## 49     25   LOREN SCHWIEBERT                  3.5   L   9 W  53 L   3 W  24
+## 50     MI   12486656 / R: 1745   -&gt;1681       N:4   B     W     B     W    
+## 51     26   MAX ZHU                           3.5   W  49 W  40 W  17 L   4
+## 52     ON   15131520 / R: 1579   -&gt;1564       N:4   B     W     B     W    
+## 53     27   GAURAV GIDWANI                    3.5   W  51 L  13 W  46 W  37
+## 54     MI   14476567 / R: 1552   -&gt;1539       N:4   W     B     W     B    
+## 55     28   SOFIA ADINA STANESCU-BELLU        3.5   W  24 D   4 W  22 D  19
+## 56     MI   14882954 / R: 1507   -&gt;1513       N:3   W     W     B     W    
+## 57     29   CHIEDOZIE OKORIE                  3.5   W  50 D   6 L  38 L  34
+## 58     MI   15323285 / R: 1602P6 -&gt;1508P12    N:4   B     W     B     W    
+## 59     30   GEORGE AVERY JONES                3.5   L  52 D  64 L  15 W  55
+## 60     ON   12577178 / R: 1522   -&gt;1444             W     B     B     W    
+## 61     31   RISHI SHETTY                      3.5   L  58 D  55 W  64 L  10
+## 62     MI   15131618 / R: 1494   -&gt;1444             B     W     B     W    
+## 63     32   JOSHUA PHILIP MATHEWS             3.5   W  61 L   8 W  44 L  18
+## 64     ON   14073750 / R: 1441   -&gt;1433       N:4   W     B     W     B    
+## 65     33   JADE GE                           3.5   W  60 L  12 W  50 D  36
+## 66     MI   14691842 / R: 1449   -&gt;1421             B     W     B     W    
+## 67     34   MICHAEL JEFFERY THOMAS            3.5   L   6 W  60 L  37 W  29
+## 68     MI   15051807 / R: 1399   -&gt;1400             B     W     B     B    
+## 69     35   JOSHUA DAVID LEE                  3.5   L  46 L  38 W  56 L   6
+## 70     MI   14601397 / R: 1438   -&gt;1392             W     W     B     W    
+## 71     36   SIDDHARTH JHA                     3.5   L  13 W  57 W  51 D  33
+## 72     MI   14773163 / R: 1355   -&gt;1367       N:4   W     B     W     B    
+## 73     37   AMIYATOSH PWNANANDAM              3.5   B     L   5 W  34 L  27
+## 74     MI   15489571 / R:  980P12-&gt;1077P17                B     W     W    
+## 75     38   BRIAN LIU                         3.0   D  11 W  35 W  29 L  12
+## 76     MI   15108523 / R: 1423   -&gt;1439       N:4   W     B     W     W    
+## 77     39   JOEL R HENDON                     3.0   L   1 W  54 W  40 L  16
+## 78     MI   12923035 / R: 1436P23-&gt;1413       N:4   B     W     B     W    
+## 79     40   FOREST ZHANG                      3.0   W  20 L  26 L  39 W  59
+## 80     MI   14892710 / R: 1348   -&gt;1346             B     B     W     W    
+## 81     41   KYLE WILLIAM MURPHY               3.0   W  59 L  17 W  58 L  20
+## 82     MI   15761443 / R: 1403P5 -&gt;1341P9           B     W     B     W    
+## 83     42   JARED GE                          3.0   L  12 L  50 L  57 D  60
+## 84     MI   14462326 / R: 1332   -&gt;1256             B     W     B     B    
+## 85     43   ROBERT GLEN VASEY                 3.0   L  21 L  23 L  24 W  63
+## 86     MI   14101068 / R: 1283   -&gt;1244             W     B     W     W    
+## 87     44   JUSTIN D SCHILLING                3.0   B     L  14 L  32 W  53
+## 88     MI   15323504 / R: 1199   -&gt;1199                   W     B     B    
+## 89     45   DEREK YAN                         3.0   L   5 L  51 D  60 L  56
+## 90     MI   15372807 / R: 1242   -&gt;1191             W     B     W     B    
+## 91     46   JACOB ALEXANDER LAVALLEY          3.0   W  35 L   7 L  27 L  50
+## 92     MI   15490981 / R:  377P3 -&gt;1076P10          B     W     B     W    
+## 93     47   ERIC WRIGHT                       2.5   L  18 W  24 L  21 W  61
+## 94     MI   12533115 / R: 1362   -&gt;1341             W     B     W     B    
+## 95     48   DANIEL KHAIN                      2.5   L  17 W  63 H     D  52
+## 96     MI   14369165 / R: 1382   -&gt;1335             B     W           B    
+## 97     49   MICHAEL J MARTIN                  2.5   L  26 L  20 D  63 D  64
+## 98     MI   12531685 / R: 1291P12-&gt;1259P17          W     W     B     W    
+## 99     50   SHIVAM JHA                        2.5   L  29 W  42 L  33 W  46
+## 100    MI   14773178 / R: 1056   -&gt;1111             W     B     W     B    
+## 101    51   TEJAS AYYAGARI                    2.5   L  27 W  45 L  36 W  57
+## 102    MI   15205474 / R: 1011   -&gt;1097             B     W     B     W    
+## 103    52   ETHAN GUO                         2.5   W  30 D  22 L  19 D  48
+## 104    MI   14918803 / R:  935   -&gt;1092       N:4   B     W     B     W    
+## 105    53   JOSE C YBARRA                     2.0   H     L  25 H     L  44
+## 106    MI   12578849 / R: 1393   -&gt;1359                   B           W    
+## 107    54   LARRY HODGE                       2.0   L  14 L  39 L  61 B    
+## 108    MI   12836773 / R: 1270   -&gt;1200             B     B     W          
+## 109    55   ALEX KONG                         2.0   L  62 D  31 L  10 L  30
+## 110    MI   15412571 / R: 1186   -&gt;1163             W     B     W     B    
+## 111    56   MARISA RICCI                      2.0   H     L  11 L  35 W  45
+## 112    MI   14679887 / R: 1153   -&gt;1140                   B     W     W    
+## 113    57   MICHAEL LU                        2.0   L   7 L  36 W  42 L  51
+## 114    MI   15113330 / R: 1092   -&gt;1079             B     W     W     B    
+## 115    58   VIRAJ MOHILE                      2.0   W  31 L   2 L  41 L  23
+## 116    MI   14700365 / R:  917   -&gt; 941             W     B     W     B    
+## 117    59   SEAN M MC CORMICK                 2.0   L  41 B     L   9 L  40
+## 118    MI   12841036 / R:  853   -&gt; 878             W           B     B    
+## 119    60   JULIA SHEN                        1.5   L  33 L  34 D  45 D  42
+## 120    MI   14579262 / R:  967   -&gt; 984             W     B     B     W    
+## 121    61   JEZZEL FARKAS                     1.5   L  32 L   3 W  54 L  47
+## 122    ON   15771592 / R:  955P11-&gt; 979P18          B     W     B     W    
+## 123    62   ASHWIN BALAJI                     1.0   W  55 U     U     U    
+## 124    MI   15219542 / R: 1530   -&gt;1535             B                      
+## 125    63   THOMAS JOSEPH HOSMER              1.0   L   2 L  48 D  49 L  43
+## 126    MI   15057092 / R: 1175   -&gt;1125             W     B     W     B    
+## 127    64   BEN LI                            1.0   L  22 D  30 L  31 D  49
+## 128    MI   15006561 / R: 1163   -&gt;1112             B     W     W     B    
+##        R5    R6    R7
+## 1   W   7 D  12 D   4
+## 2   W     B     W    
+## 3   W  16 W  20 W   7
+## 4   B     W     B    
+## 5   W  11 W  13 W  12
+## 6   W     B     W    
+## 7   D   5 W  19 D   1
+## 8   W     B     B    
+## 9   D   4 W  14 W  17
+## 10  B     W     B    
+## 11  D  10 W  27 W  21
+## 12  B     W     B    
+## 13  L   1 W   9 L   2
+## 14  B     W     W    
+## 15  W  47 W  28 W  19
+## 16  B     W     W    
+## 17  W  26 L   7 W  20
+## 18  W     B     B    
+## 19  D   6 W  25 W  18
+## 20  W     B     W    
+## 21  L   3 W  34 W  26
+## 22  B     W     B    
+## 23  H     D   1 L   3
+## 24        W     B    
+## 25  W  33 L   3 W  32
+## 26  W     W     B    
+## 27  D  27 L   5 W  31
+## 28  B     B     W    
+## 29  W  54 W  33 W  38
+## 30  B     B     W    
+## 31  L   2 W  36 U    
+## 32  W     B          
+## 33  W  23 W  22 L   5
+## 34  W     B     W    
+## 35  L  19 W  38 L  10
+## 36  B     W     B    
+## 37  W  18 L   4 L   8
+## 38  W     W     B    
+## 39  W  28 L   2 L   9
+## 40  W     B     W    
+## 41  W  40 W  39 L   6
+## 42  W     B     W    
+## 43  H     L  17 W  40
+## 44        W     B    
+## 45  L  17 W  37 W  46
+## 46  B     W     B    
+## 47  W  60 W  44 W  39
+## 48  W     W     B    
+## 49  D  34 L  10 W  47
+## 50  B     W     B    
+## 51  L   9 D  32 L  11
+## 52  B     W     W    
+## 53  D  14 L   6 U    
+## 54  W     B          
+## 55  L  20 L   8 D  36
+## 56  B     B     W    
+## 57  W  52 W  48 U    
+## 58  W     B          
+## 59  L  31 W  61 W  50
+## 60  W     B     B    
+## 61  W  30 W  50 L  14
+## 62  B     W     B    
+## 63  W  51 D  26 L  13
+## 64  W     B     W    
+## 65  L  13 L  15 W  51
+## 66  B     W     B    
+## 67  D  25 L  11 W  52
+## 68  W     B     W    
+## 69  W  57 D  52 W  48
+## 70  B     B     W    
+## 71  H     L  16 D  28
+## 72        W     B    
+## 73  H     L  23 W  61
+## 74        B     W    
+## 75  H     L  18 L  15
+## 76        B     B    
+## 77  W  44 L  21 L  24
+## 78  B     W     W    
+## 79  L  21 W  56 L  22
+## 80  B     W     W    
+## 81  X     U     U    
+## 82                   
+## 83  D  61 W  64 W  56
+## 84  W     W     B    
+## 85  W  59 L  46 W  55
+## 86  B     B     W    
+## 87  L  39 L  24 W  59
+## 88  W     B     W    
+## 89  W  63 D  55 W  58
+## 90  W     B     W    
+## 91  W  64 W  43 L  23
+## 92  B     W     W    
+## 93  L   8 D  51 L  25
+## 94  W     B     W    
+## 95  H     L  29 L  35
+## 96        W     B    
+## 97  W  58 H     U    
+## 98  B                
+## 99  H     L  31 L  30
+## 100       B     W    
+## 101 L  32 D  47 L  33
+## 102 B     W     W    
+## 103 L  29 D  35 L  34
+## 104 B     W     B    
+## 105 U     W  57 U    
+## 106       W          
+## 107 L  15 L  59 W  64
+## 108 W     B     W    
+## 109 B     D  45 L  43
+## 110       W     B    
+## 111 H     L  40 L  42
+## 112       B     W    
+## 113 L  35 L  53 B    
+## 114 W     B          
+## 115 L  49 B     L  45
+## 116 W           B    
+## 117 L  43 W  54 L  44
+## 118 W     W     B    
+## 119 L  24 H     U    
+## 120 B                
+## 121 D  42 L  30 L  37
+## 122 B     W     B    
+## 123 U     U     U    
+## 124                  
+## 125 L  45 H     U    
+## 126 B                
+## 127 L  46 L  42 L  54
+## 128 W     B     B</code></pre>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>row_1 <span class="ot">&lt;-</span> data <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="fu">row_number</span>() <span class="sc">%%</span><span class="dv">2</span> <span class="sc">==</span> <span class="dv">1</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>row_2 <span class="ot">&lt;-</span> data <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="fu">row_number</span>() <span class="sc">%%</span><span class="dv">2</span> <span class="sc">==</span> <span class="dv">0</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>data_w <span class="ot">&lt;-</span> <span class="fu">cbind</span>(row_1, row_2)</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="fu">colnames</span>(data_w) <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;Pair&quot;</span>, <span class="st">&quot;Name&quot;</span>, <span class="st">&quot;Points&quot;</span>, <span class="st">&quot;R1&quot;</span>, <span class="st">&quot;R2&quot;</span>, <span class="st">&quot;R3&quot;</span>, <span class="st">&quot;R4&quot;</span>, <span class="st">&quot;R5&quot;</span>, <span class="st">&quot;R6&quot;</span>, <span class="st">&quot;R7&quot;</span>, <span class="st">&quot;State&quot;</span>, <span class="st">&quot;ID_Rating&quot;</span>, <span class="st">&quot;Points_2&quot;</span>, <span class="st">&quot;R1_2&quot;</span>, <span class="st">&quot;R2_2&quot;</span>, <span class="st">&quot;R3_2&quot;</span>, <span class="st">&quot;R4_2&quot;</span>, <span class="st">&quot;R5_2&quot;</span>, <span class="st">&quot;R6_2&quot;</span>, <span class="st">&quot;R7_2&quot;</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="fu">print</span>(data_w)</span></code></pre></div>
+<pre><code>##      Pair                              Name Points    R1    R2    R3    R4
+## 1      1   GARY HUA                          6.0   W  39 W  21 W  18 W  14
+## 2      2   DAKSHESH DARURI                   6.0   W  63 W  58 L   4 W  17
+## 3      3   ADITYA BAJAJ                      6.0   L   8 W  61 W  25 W  21
+## 4      4   PATRICK H SCHILLING               5.5   W  23 D  28 W   2 W  26
+## 5      5   HANSHI ZUO                        5.5   W  45 W  37 D  12 D  13
+## 6      6   HANSEN SONG                       5.0   W  34 D  29 L  11 W  35
+## 7      7   GARY DEE SWATHELL                 5.0   W  57 W  46 W  13 W  11
+## 8      8   EZEKIEL HOUGHTON                  5.0   W   3 W  32 L  14 L   9
+## 9      9   STEFANO LEE                       5.0   W  25 L  18 W  59 W   8
+## 10    10   ANVIT RAO                         5.0   D  16 L  19 W  55 W  31
+## 11    11   CAMERON WILLIAM MC LEMAN          4.5   D  38 W  56 W   6 L   7
+## 12    12   KENNETH J TACK                    4.5   W  42 W  33 D   5 W  38
+## 13    13   TORRANCE HENRY JR                 4.5   W  36 W  27 L   7 D   5
+## 14    14   BRADLEY SHAW                      4.5   W  54 W  44 W   8 L   1
+## 15    15   ZACHARY JAMES HOUGHTON            4.5   D  19 L  16 W  30 L  22
+## 16    16   MIKE NIKITIN                      4.0   D  10 W  15 H     W  39
+## 17    17   RONALD GRZEGORCZYK                4.0   W  48 W  41 L  26 L   2
+## 18    18   DAVID SUNDEEN                     4.0   W  47 W   9 L   1 W  32
+## 19    19   DIPANKAR ROY                      4.0   D  15 W  10 W  52 D  28
+## 20    20   JASON ZHENG                       4.0   L  40 W  49 W  23 W  41
+## 21    21   DINH DANG BUI                     4.0   W  43 L   1 W  47 L   3
+## 22    22   EUGENE L MCCLURE                  4.0   W  64 D  52 L  28 W  15
+## 23    23   ALAN BUI                          4.0   L   4 W  43 L  20 W  58
+## 24    24   MICHAEL R ALDRICH                 4.0   L  28 L  47 W  43 L  25
+## 25    25   LOREN SCHWIEBERT                  3.5   L   9 W  53 L   3 W  24
+## 26    26   MAX ZHU                           3.5   W  49 W  40 W  17 L   4
+## 27    27   GAURAV GIDWANI                    3.5   W  51 L  13 W  46 W  37
+## 28    28   SOFIA ADINA STANESCU-BELLU        3.5   W  24 D   4 W  22 D  19
+## 29    29   CHIEDOZIE OKORIE                  3.5   W  50 D   6 L  38 L  34
+## 30    30   GEORGE AVERY JONES                3.5   L  52 D  64 L  15 W  55
+## 31    31   RISHI SHETTY                      3.5   L  58 D  55 W  64 L  10
+## 32    32   JOSHUA PHILIP MATHEWS             3.5   W  61 L   8 W  44 L  18
+## 33    33   JADE GE                           3.5   W  60 L  12 W  50 D  36
+## 34    34   MICHAEL JEFFERY THOMAS            3.5   L   6 W  60 L  37 W  29
+## 35    35   JOSHUA DAVID LEE                  3.5   L  46 L  38 W  56 L   6
+## 36    36   SIDDHARTH JHA                     3.5   L  13 W  57 W  51 D  33
+## 37    37   AMIYATOSH PWNANANDAM              3.5   B     L   5 W  34 L  27
+## 38    38   BRIAN LIU                         3.0   D  11 W  35 W  29 L  12
+## 39    39   JOEL R HENDON                     3.0   L   1 W  54 W  40 L  16
+## 40    40   FOREST ZHANG                      3.0   W  20 L  26 L  39 W  59
+## 41    41   KYLE WILLIAM MURPHY               3.0   W  59 L  17 W  58 L  20
+## 42    42   JARED GE                          3.0   L  12 L  50 L  57 D  60
+## 43    43   ROBERT GLEN VASEY                 3.0   L  21 L  23 L  24 W  63
+## 44    44   JUSTIN D SCHILLING                3.0   B     L  14 L  32 W  53
+## 45    45   DEREK YAN                         3.0   L   5 L  51 D  60 L  56
+## 46    46   JACOB ALEXANDER LAVALLEY          3.0   W  35 L   7 L  27 L  50
+## 47    47   ERIC WRIGHT                       2.5   L  18 W  24 L  21 W  61
+## 48    48   DANIEL KHAIN                      2.5   L  17 W  63 H     D  52
+## 49    49   MICHAEL J MARTIN                  2.5   L  26 L  20 D  63 D  64
+## 50    50   SHIVAM JHA                        2.5   L  29 W  42 L  33 W  46
+## 51    51   TEJAS AYYAGARI                    2.5   L  27 W  45 L  36 W  57
+## 52    52   ETHAN GUO                         2.5   W  30 D  22 L  19 D  48
+## 53    53   JOSE C YBARRA                     2.0   H     L  25 H     L  44
+## 54    54   LARRY HODGE                       2.0   L  14 L  39 L  61 B    
+## 55    55   ALEX KONG                         2.0   L  62 D  31 L  10 L  30
+## 56    56   MARISA RICCI                      2.0   H     L  11 L  35 W  45
+## 57    57   MICHAEL LU                        2.0   L   7 L  36 W  42 L  51
+## 58    58   VIRAJ MOHILE                      2.0   W  31 L   2 L  41 L  23
+## 59    59   SEAN M MC CORMICK                 2.0   L  41 B     L   9 L  40
+## 60    60   JULIA SHEN                        1.5   L  33 L  34 D  45 D  42
+## 61    61   JEZZEL FARKAS                     1.5   L  32 L   3 W  54 L  47
+## 62    62   ASHWIN BALAJI                     1.0   W  55 U     U     U    
+## 63    63   THOMAS JOSEPH HOSMER              1.0   L   2 L  48 D  49 L  43
+## 64    64   BEN LI                            1.0   L  22 D  30 L  31 D  49
+##       R5    R6    R7  State                         ID_Rating Points_2  R1_2
+## 1  W   7 D  12 D   4    ON   15445895 / R: 1794   -&gt;1817         N:2   W    
+## 2  W  16 W  20 W   7    MI   14598900 / R: 1553   -&gt;1663         N:2   B    
+## 3  W  11 W  13 W  12    MI   14959604 / R: 1384   -&gt;1640         N:2   W    
+## 4  D   5 W  19 D   1    MI   12616049 / R: 1716   -&gt;1744         N:2   W    
+## 5  D   4 W  14 W  17    MI   14601533 / R: 1655   -&gt;1690         N:2   B    
+## 6  D  10 W  27 W  21    OH   15055204 / R: 1686   -&gt;1687         N:3   W    
+## 7  L   1 W   9 L   2    MI   11146376 / R: 1649   -&gt;1673         N:3   W    
+## 8  W  47 W  28 W  19    MI   15142253 / R: 1641P17-&gt;1657P24      N:3   B    
+## 9  W  26 L   7 W  20    ON   14954524 / R: 1411   -&gt;1564         N:2   W    
+## 10 D   6 W  25 W  18    MI   14150362 / R: 1365   -&gt;1544         N:3   W    
+## 11 L   3 W  34 W  26    MI   12581589 / R: 1712   -&gt;1696         N:3   B    
+## 12 H     D   1 L   3    MI   12681257 / R: 1663   -&gt;1670         N:3   W    
+## 13 W  33 L   3 W  32    MI   15082995 / R: 1666   -&gt;1662         N:3   B    
+## 14 D  27 L   5 W  31    MI   10131499 / R: 1610   -&gt;1618         N:3   W    
+## 15 W  54 W  33 W  38    MI   15619130 / R: 1220P13-&gt;1416P20      N:3   B    
+## 16 L   2 W  36 U        MI   10295068 / R: 1604   -&gt;1613         N:3   B    
+## 17 W  23 W  22 L   5    MI   10297702 / R: 1629   -&gt;1610         N:3   W    
+## 18 L  19 W  38 L  10    MI   11342094 / R: 1600   -&gt;1600         N:3   B    
+## 19 W  18 L   4 L   8    MI   14862333 / R: 1564   -&gt;1570         N:3   W    
+## 20 W  28 L   2 L   9    MI   14529060 / R: 1595   -&gt;1569         N:4   W    
+## 21 W  40 W  39 L   6    ON   15495066 / R: 1563P22-&gt;1562         N:3   B    
+## 22 H     L  17 W  40    MI   12405534 / R: 1555   -&gt;1529         N:4   W    
+## 23 L  17 W  37 W  46    ON   15030142 / R: 1363   -&gt;1371               B    
+## 24 W  60 W  44 W  39    MI   13469010 / R: 1229   -&gt;1300         N:4   B    
+## 25 D  34 L  10 W  47    MI   12486656 / R: 1745   -&gt;1681         N:4   B    
+## 26 L   9 D  32 L  11    ON   15131520 / R: 1579   -&gt;1564         N:4   B    
+## 27 D  14 L   6 U        MI   14476567 / R: 1552   -&gt;1539         N:4   W    
+## 28 L  20 L   8 D  36    MI   14882954 / R: 1507   -&gt;1513         N:3   W    
+## 29 W  52 W  48 U        MI   15323285 / R: 1602P6 -&gt;1508P12      N:4   B    
+## 30 L  31 W  61 W  50    ON   12577178 / R: 1522   -&gt;1444               W    
+## 31 W  30 W  50 L  14    MI   15131618 / R: 1494   -&gt;1444               B    
+## 32 W  51 D  26 L  13    ON   14073750 / R: 1441   -&gt;1433         N:4   W    
+## 33 L  13 L  15 W  51    MI   14691842 / R: 1449   -&gt;1421               B    
+## 34 D  25 L  11 W  52    MI   15051807 / R: 1399   -&gt;1400               B    
+## 35 W  57 D  52 W  48    MI   14601397 / R: 1438   -&gt;1392               W    
+## 36 H     L  16 D  28    MI   14773163 / R: 1355   -&gt;1367         N:4   W    
+## 37 H     L  23 W  61    MI   15489571 / R:  980P12-&gt;1077P17                 
+## 38 H     L  18 L  15    MI   15108523 / R: 1423   -&gt;1439         N:4   W    
+## 39 W  44 L  21 L  24    MI   12923035 / R: 1436P23-&gt;1413         N:4   B    
+## 40 L  21 W  56 L  22    MI   14892710 / R: 1348   -&gt;1346               B    
+## 41 X     U     U        MI   15761443 / R: 1403P5 -&gt;1341P9             B    
+## 42 D  61 W  64 W  56    MI   14462326 / R: 1332   -&gt;1256               B    
+## 43 W  59 L  46 W  55    MI   14101068 / R: 1283   -&gt;1244               W    
+## 44 L  39 L  24 W  59    MI   15323504 / R: 1199   -&gt;1199                    
+## 45 W  63 D  55 W  58    MI   15372807 / R: 1242   -&gt;1191               W    
+## 46 W  64 W  43 L  23    MI   15490981 / R:  377P3 -&gt;1076P10            B    
+## 47 L   8 D  51 L  25    MI   12533115 / R: 1362   -&gt;1341               W    
+## 48 H     L  29 L  35    MI   14369165 / R: 1382   -&gt;1335               B    
+## 49 W  58 H     U        MI   12531685 / R: 1291P12-&gt;1259P17            W    
+## 50 H     L  31 L  30    MI   14773178 / R: 1056   -&gt;1111               W    
+## 51 L  32 D  47 L  33    MI   15205474 / R: 1011   -&gt;1097               B    
+## 52 L  29 D  35 L  34    MI   14918803 / R:  935   -&gt;1092         N:4   B    
+## 53 U     W  57 U        MI   12578849 / R: 1393   -&gt;1359                    
+## 54 L  15 L  59 W  64    MI   12836773 / R: 1270   -&gt;1200               B    
+## 55 B     D  45 L  43    MI   15412571 / R: 1186   -&gt;1163               W    
+## 56 H     L  40 L  42    MI   14679887 / R: 1153   -&gt;1140                    
+## 57 L  35 L  53 B        MI   15113330 / R: 1092   -&gt;1079               B    
+## 58 L  49 B     L  45    MI   14700365 / R:  917   -&gt; 941               W    
+## 59 L  43 W  54 L  44    MI   12841036 / R:  853   -&gt; 878               W    
+## 60 L  24 H     U        MI   14579262 / R:  967   -&gt; 984               W    
+## 61 D  42 L  30 L  37    ON   15771592 / R:  955P11-&gt; 979P18            B    
+## 62 U     U     U        MI   15219542 / R: 1530   -&gt;1535               B    
+## 63 L  45 H     U        MI   15057092 / R: 1175   -&gt;1125               W    
+## 64 L  46 L  42 L  54    MI   15006561 / R: 1163   -&gt;1112               B    
+##     R2_2  R3_2  R4_2  R5_2  R6_2  R7_2
+## 1  B     W     B     W     B     W    
+## 2  W     B     W     B     W     B    
+## 3  B     W     B     W     B     W    
+## 4  B     W     B     W     B     B    
+## 5  W     B     W     B     W     B    
+## 6  B     W     B     B     W     B    
+## 7  B     W     B     B     W     W    
+## 8  W     B     W     B     W     W    
+## 9  B     W     B     W     B     B    
+## 10 W     B     B     W     B     W    
+## 11 W     B     W     B     W     B    
+## 12 B     W     B           W     B    
+## 13 W     B     B     W     W     B    
+## 14 B     W     W     B     B     W    
+## 15 B     W     W     B     B     W    
+## 16 W           B     W     B          
+## 17 B     W     B     W     B     W    
+## 18 W     B     W     B     W     B    
+## 19 B     W     B     W     W     B    
+## 20 B     W     B     W     B     W    
+## 21 W     B     W     W     B     W    
+## 22 B     W     B           W     B    
+## 23 W     B     W     B     W     B    
+## 24 W     B     B     W     W     B    
+## 25 W     B     W     B     W     B    
+## 26 W     B     W     B     W     W    
+## 27 B     W     B     W     B          
+## 28 W     B     W     B     B     W    
+## 29 W     B     W     W     B          
+## 30 B     B     W     W     B     B    
+## 31 W     B     W     B     W     B    
+## 32 B     W     B     W     B     W    
+## 33 W     B     W     B     W     B    
+## 34 W     B     B     W     B     W    
+## 35 W     B     W     B     B     W    
+## 36 B     W     B           W     B    
+## 37 B     W     W           B     W    
+## 38 B     W     W           B     B    
+## 39 W     B     W     B     W     W    
+## 40 B     W     W     B     W     W    
+## 41 W     B     W                      
+## 42 W     B     B     W     W     B    
+## 43 B     W     W     B     B     W    
+## 44 W     B     B     W     B     W    
+## 45 B     W     B     W     B     W    
+## 46 W     B     W     B     W     W    
+## 47 B     W     B     W     B     W    
+## 48 W           B           W     B    
+## 49 W     B     W     B                
+## 50 B     W     B           B     W    
+## 51 W     B     W     B     W     W    
+## 52 W     B     W     B     W     B    
+## 53 B           W           W          
+## 54 B     W           W     B     W    
+## 55 B     W     B           W     B    
+## 56 B     W     W           B     W    
+## 57 W     W     B     W     B          
+## 58 B     W     B     W           B    
+## 59       B     B     W     W     B    
+## 60 B     B     W     B                
+## 61 W     B     W     B     W     B    
+## 62                                    
+## 63 B     W     B     B                
+## 64 W     W     B     W     B     B</code></pre>
 <p>I leveraged Regex to create new columns of each round to identify
 Wins, Losses or Draws and likewise for the column pre_ratings.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>data_w <span class="ot">&lt;-</span> data_w <span class="sc">%&gt;%</span></span>
-<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>  <span class="fu">separate_wider_regex</span>(</span>
-<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>    <span class="fu">c</span>(R1<span class="sc">:</span>R7),</span>
-<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>    <span class="at">patterns =</span> <span class="fu">c</span>(</span>
-<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>      <span class="st">&quot;[BDHLUWX] {2,4}&quot;</span>,</span>
-<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>      <span class="co"># Create new columns by extracting data using Regex expressions to identify Wins, Losses and Draws from Rounds 1-7.</span></span>
-<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>      <span class="at">opponent_ID =</span> <span class="st">&quot;(?:</span><span class="sc">\\</span><span class="st">d+)?&quot;</span></span>
-<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>    ),</span>
-<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>     <span class="co"># Include new colums to identify which Rounds in the chess game had Wins, Losses or Draws</span></span>
-<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>    <span class="at">names_sep =</span> <span class="st">&quot;_&quot;</span></span>
-<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a>  )</span></code></pre></div>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>data_w <span class="ot">&lt;-</span> data_w <span class="sc">%&gt;%</span></span>
-<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>  <span class="fu">separate_wider_regex</span>(</span>
-<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>    ID_Rating,</span>
-<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>    <span class="at">patterns =</span> <span class="fu">c</span>(</span>
-<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>      <span class="st">&quot; </span><span class="sc">\\</span><span class="st">d{8} / R: +&quot;</span>,</span>
-<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>      <span class="at">pre_ratings =</span> <span class="st">&quot;</span><span class="sc">\\</span><span class="st">d+&quot;</span>,</span>
-<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>      <span class="st">&quot;[ P0-9]*-&gt; *&quot;</span>,</span>
-<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>      <span class="st">&quot;</span><span class="sc">\\</span><span class="st">d+[ P0-9]*&quot;</span></span>
-<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>    )</span>
-<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a>  )</span></code></pre></div>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="co"># Replace missing values with NA</span></span>
-<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>data_w <span class="ot">&lt;-</span> <span class="fu">replace</span>(data_w, data_w<span class="sc">==</span><span class="st">&#39;&#39;</span>, <span class="cn">NA</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>data_w<span class="sc">$</span>pre_ratings <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(data_w<span class="sc">$</span>pre_ratings)</span></code></pre></div>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>data_w<span class="sc">$</span>Pair <span class="ot">&lt;-</span> <span class="fu">str_trim</span>(data_w<span class="sc">$</span>Pair)</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>data_w <span class="ot">&lt;-</span> data_w <span class="sc">%&gt;%</span></span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>  <span class="fu">separate_wider_regex</span>(</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>    <span class="fu">c</span>(R1<span class="sc">:</span>R7),</span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>    <span class="at">patterns =</span> <span class="fu">c</span>(</span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>      <span class="st">&quot;[BDHLUWX] {2,4}&quot;</span>,</span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a>      <span class="co"># Create new columns by extracting data using Regex expressions to identify Wins, Losses and Draws from Rounds 1-7.</span></span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a>      <span class="at">opponent_ID =</span> <span class="st">&quot;(?:</span><span class="sc">\\</span><span class="st">d+)?&quot;</span></span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a>    ),</span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a>     <span class="co"># Include new colums to identify which Rounds in the chess game had Wins, Losses or Draws</span></span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a>    <span class="at">names_sep =</span> <span class="st">&quot;_&quot;</span></span>
+<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a>  )</span>
+<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a><span class="fu">print</span>(data_w)</span></code></pre></div>
+<pre><code>## # A tibble: 64 × 20
+##    Pair     Name             Points R1_opponent_ID R2_opponent_ID R3_opponent_ID
+##    &lt;chr&gt;    &lt;chr&gt;            &lt;chr&gt;  &lt;chr&gt;          &lt;chr&gt;          &lt;chr&gt;         
+##  1 &quot;    1 &quot; &quot; GARY HUA     … &quot;6.0 … 39             21             18            
+##  2 &quot;    2 &quot; &quot; DAKSHESH DARU… &quot;6.0 … 63             58             4             
+##  3 &quot;    3 &quot; &quot; ADITYA BAJAJ … &quot;6.0 … 8              61             25            
+##  4 &quot;    4 &quot; &quot; PATRICK H SCH… &quot;5.5 … 23             28             2             
+##  5 &quot;    5 &quot; &quot; HANSHI ZUO   … &quot;5.5 … 45             37             12            
+##  6 &quot;    6 &quot; &quot; HANSEN SONG  … &quot;5.0 … 34             29             11            
+##  7 &quot;    7 &quot; &quot; GARY DEE SWAT… &quot;5.0 … 57             46             13            
+##  8 &quot;    8 &quot; &quot; EZEKIEL HOUGH… &quot;5.0 … 3              32             14            
+##  9 &quot;    9 &quot; &quot; STEFANO LEE  … &quot;5.0 … 25             18             59            
+## 10 &quot;   10 &quot; &quot; ANVIT RAO    … &quot;5.0 … 16             19             55            
+## # ℹ 54 more rows
+## # ℹ 14 more variables: R4_opponent_ID &lt;chr&gt;, R5_opponent_ID &lt;chr&gt;,
+## #   R6_opponent_ID &lt;chr&gt;, R7_opponent_ID &lt;chr&gt;, State &lt;chr&gt;, ID_Rating &lt;chr&gt;,
+## #   Points_2 &lt;chr&gt;, R1_2 &lt;chr&gt;, R2_2 &lt;chr&gt;, R3_2 &lt;chr&gt;, R4_2 &lt;chr&gt;, R5_2 &lt;chr&gt;,
+## #   R6_2 &lt;chr&gt;, R7_2 &lt;chr&gt;</code></pre>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>data_w <span class="ot">&lt;-</span> data_w <span class="sc">%&gt;%</span></span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>  <span class="fu">separate_wider_regex</span>(</span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>    ID_Rating,</span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>    <span class="at">patterns =</span> <span class="fu">c</span>(</span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a>      <span class="st">&quot; </span><span class="sc">\\</span><span class="st">d{8} / R: +&quot;</span>,</span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a>      <span class="at">pre_ratings =</span> <span class="st">&quot;</span><span class="sc">\\</span><span class="st">d+&quot;</span>,</span>
+<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a>      <span class="st">&quot;[ P0-9]*-&gt; *&quot;</span>,</span>
+<span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a>      <span class="st">&quot;</span><span class="sc">\\</span><span class="st">d+[ P0-9]*&quot;</span></span>
+<span id="cb11-9"><a href="#cb11-9" tabindex="-1"></a>    )</span>
+<span id="cb11-10"><a href="#cb11-10" tabindex="-1"></a>  )</span>
+<span id="cb11-11"><a href="#cb11-11" tabindex="-1"></a><span class="fu">print</span>(data_w)</span></code></pre></div>
+<pre><code>## # A tibble: 64 × 20
+##    Pair     Name             Points R1_opponent_ID R2_opponent_ID R3_opponent_ID
+##    &lt;chr&gt;    &lt;chr&gt;            &lt;chr&gt;  &lt;chr&gt;          &lt;chr&gt;          &lt;chr&gt;         
+##  1 &quot;    1 &quot; &quot; GARY HUA     … &quot;6.0 … 39             21             18            
+##  2 &quot;    2 &quot; &quot; DAKSHESH DARU… &quot;6.0 … 63             58             4             
+##  3 &quot;    3 &quot; &quot; ADITYA BAJAJ … &quot;6.0 … 8              61             25            
+##  4 &quot;    4 &quot; &quot; PATRICK H SCH… &quot;5.5 … 23             28             2             
+##  5 &quot;    5 &quot; &quot; HANSHI ZUO   … &quot;5.5 … 45             37             12            
+##  6 &quot;    6 &quot; &quot; HANSEN SONG  … &quot;5.0 … 34             29             11            
+##  7 &quot;    7 &quot; &quot; GARY DEE SWAT… &quot;5.0 … 57             46             13            
+##  8 &quot;    8 &quot; &quot; EZEKIEL HOUGH… &quot;5.0 … 3              32             14            
+##  9 &quot;    9 &quot; &quot; STEFANO LEE  … &quot;5.0 … 25             18             59            
+## 10 &quot;   10 &quot; &quot; ANVIT RAO    … &quot;5.0 … 16             19             55            
+## # ℹ 54 more rows
+## # ℹ 14 more variables: R4_opponent_ID &lt;chr&gt;, R5_opponent_ID &lt;chr&gt;,
+## #   R6_opponent_ID &lt;chr&gt;, R7_opponent_ID &lt;chr&gt;, State &lt;chr&gt;, pre_ratings &lt;chr&gt;,
+## #   Points_2 &lt;chr&gt;, R1_2 &lt;chr&gt;, R2_2 &lt;chr&gt;, R3_2 &lt;chr&gt;, R4_2 &lt;chr&gt;, R5_2 &lt;chr&gt;,
+## #   R6_2 &lt;chr&gt;, R7_2 &lt;chr&gt;</code></pre>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="co"># Replace missing values with NA</span></span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>data_w <span class="ot">&lt;-</span> <span class="fu">replace</span>(data_w, data_w<span class="sc">==</span><span class="st">&#39;&#39;</span>, <span class="cn">NA</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a><span class="fu">print</span>(data_w)</span></code></pre></div>
+<pre><code>## # A tibble: 64 × 20
+##    Pair     Name             Points R1_opponent_ID R2_opponent_ID R3_opponent_ID
+##    &lt;chr&gt;    &lt;chr&gt;            &lt;chr&gt;  &lt;chr&gt;          &lt;chr&gt;          &lt;chr&gt;         
+##  1 &quot;    1 &quot; &quot; GARY HUA     … &quot;6.0 … 39             21             18            
+##  2 &quot;    2 &quot; &quot; DAKSHESH DARU… &quot;6.0 … 63             58             4             
+##  3 &quot;    3 &quot; &quot; ADITYA BAJAJ … &quot;6.0 … 8              61             25            
+##  4 &quot;    4 &quot; &quot; PATRICK H SCH… &quot;5.5 … 23             28             2             
+##  5 &quot;    5 &quot; &quot; HANSHI ZUO   … &quot;5.5 … 45             37             12            
+##  6 &quot;    6 &quot; &quot; HANSEN SONG  … &quot;5.0 … 34             29             11            
+##  7 &quot;    7 &quot; &quot; GARY DEE SWAT… &quot;5.0 … 57             46             13            
+##  8 &quot;    8 &quot; &quot; EZEKIEL HOUGH… &quot;5.0 … 3              32             14            
+##  9 &quot;    9 &quot; &quot; STEFANO LEE  … &quot;5.0 … 25             18             59            
+## 10 &quot;   10 &quot; &quot; ANVIT RAO    … &quot;5.0 … 16             19             55            
+## # ℹ 54 more rows
+## # ℹ 14 more variables: R4_opponent_ID &lt;chr&gt;, R5_opponent_ID &lt;chr&gt;,
+## #   R6_opponent_ID &lt;chr&gt;, R7_opponent_ID &lt;chr&gt;, State &lt;chr&gt;, pre_ratings &lt;chr&gt;,
+## #   Points_2 &lt;chr&gt;, R1_2 &lt;chr&gt;, R2_2 &lt;chr&gt;, R3_2 &lt;chr&gt;, R4_2 &lt;chr&gt;, R5_2 &lt;chr&gt;,
+## #   R6_2 &lt;chr&gt;, R7_2 &lt;chr&gt;</code></pre>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a>data_w<span class="sc">$</span>pre_ratings <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(data_w<span class="sc">$</span>pre_ratings)</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a>data_w<span class="sc">$</span>Pair <span class="ot">&lt;-</span> <span class="fu">str_trim</span>(data_w<span class="sc">$</span>Pair)</span></code></pre></div>
 </div>
 <div id="update-the-data-by-calculating-average-pre-rating-of-opponents" class="section level3">
 <h3>Update the data by Calculating average pre-rating of opponents</h3>
 <p>Once the data was cleaned and transformed, I calculated the average
 pre-rating of each player’s opponents.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>pre_ratings_updated <span class="ot">&lt;-</span> data_w<span class="sc">$</span>pre_ratings</span>
-<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a><span class="fu">names</span>(pre_ratings_updated) <span class="ot">&lt;-</span> data_w<span class="sc">$</span>Pair</span></code></pre></div>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>data_w <span class="ot">&lt;-</span> data_w <span class="sc">%&gt;%</span></span>
-<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>  rowwise <span class="sc">%&gt;%</span>  </span>
-<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a>      <span class="at">total_opponent_pre_ratings =</span> <span class="fu">sum</span>(<span class="fu">across</span>(</span>
-<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a>            <span class="at">.cols =</span> <span class="fu">ends_with</span>(<span class="st">&quot;_opponent_ID&quot;</span>),</span>
-<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a>            <span class="at">.fns =</span> <span class="sc">~</span> <span class="fu">unname</span>(pre_ratings_updated[.x])),</span>
-<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a>          <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a>      </span>
-<span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a>      <span class="at">num_of_opponents =</span> <span class="fu">sum</span>(<span class="fu">across</span>(</span>
-<span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a>            <span class="at">.cols =</span> <span class="fu">ends_with</span>(<span class="st">&quot;_opponent_ID&quot;</span>),</span>
-<span id="cb12-11"><a href="#cb12-11" tabindex="-1"></a>            <span class="at">.fns =</span> <span class="sc">~</span> <span class="sc">!</span><span class="fu">is.na</span>(.x))),</span>
-<span id="cb12-12"><a href="#cb12-12" tabindex="-1"></a>      </span>
-<span id="cb12-13"><a href="#cb12-13" tabindex="-1"></a>      <span class="at">average_opponent_pre_rating =</span> <span class="fu">ifelse</span>(num_of_opponents <span class="sc">==</span> <span class="dv">0</span>, <span class="cn">NA</span>, </span>
-<span id="cb12-14"><a href="#cb12-14" tabindex="-1"></a>                                           <span class="fu">floor</span>(total_opponent_pre_ratings <span class="sc">/</span> num_of_opponents))</span>
-<span id="cb12-15"><a href="#cb12-15" tabindex="-1"></a>  )</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a>pre_ratings_updated <span class="ot">&lt;-</span> data_w<span class="sc">$</span>pre_ratings</span>
+<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a><span class="fu">names</span>(pre_ratings_updated) <span class="ot">&lt;-</span> data_w<span class="sc">$</span>Pair</span>
+<span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a><span class="fu">print</span>(pre_ratings_updated)</span></code></pre></div>
+<pre><code>##    1    2    3    4    5    6    7    8    9   10   11   12   13   14   15   16 
+## 1794 1553 1384 1716 1655 1686 1649 1641 1411 1365 1712 1663 1666 1610 1220 1604 
+##   17   18   19   20   21   22   23   24   25   26   27   28   29   30   31   32 
+## 1629 1600 1564 1595 1563 1555 1363 1229 1745 1579 1552 1507 1602 1522 1494 1441 
+##   33   34   35   36   37   38   39   40   41   42   43   44   45   46   47   48 
+## 1449 1399 1438 1355  980 1423 1436 1348 1403 1332 1283 1199 1242  377 1362 1382 
+##   49   50   51   52   53   54   55   56   57   58   59   60   61   62   63   64 
+## 1291 1056 1011  935 1393 1270 1186 1153 1092  917  853  967  955 1530 1175 1163</code></pre>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a>data_w <span class="ot">&lt;-</span> data_w <span class="sc">%&gt;%</span></span>
+<span id="cb19-2"><a href="#cb19-2" tabindex="-1"></a>  rowwise <span class="sc">%&gt;%</span>  </span>
+<span id="cb19-3"><a href="#cb19-3" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb19-4"><a href="#cb19-4" tabindex="-1"></a>      <span class="at">total_opponent_pre_ratings =</span> <span class="fu">sum</span>(<span class="fu">across</span>(</span>
+<span id="cb19-5"><a href="#cb19-5" tabindex="-1"></a>            <span class="at">.cols =</span> <span class="fu">ends_with</span>(<span class="st">&quot;_opponent_ID&quot;</span>),</span>
+<span id="cb19-6"><a href="#cb19-6" tabindex="-1"></a>            <span class="at">.fns =</span> <span class="sc">~</span> <span class="fu">unname</span>(pre_ratings_updated[.x])),</span>
+<span id="cb19-7"><a href="#cb19-7" tabindex="-1"></a>          <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb19-8"><a href="#cb19-8" tabindex="-1"></a>      </span>
+<span id="cb19-9"><a href="#cb19-9" tabindex="-1"></a>      <span class="at">num_of_rounds =</span> <span class="fu">ncol</span>(<span class="fu">select</span>(data_w, <span class="fu">starts_with</span>(<span class="st">&quot;R&quot;</span>))), <span class="co"># Count the number of rounds</span></span>
+<span id="cb19-10"><a href="#cb19-10" tabindex="-1"></a>      </span>
+<span id="cb19-11"><a href="#cb19-11" tabindex="-1"></a>      <span class="at">average_opponent_pre_rating =</span> <span class="fu">ifelse</span>(num_of_rounds <span class="sc">==</span> <span class="dv">0</span>, <span class="cn">NA</span>, </span>
+<span id="cb19-12"><a href="#cb19-12" tabindex="-1"></a>                                           <span class="fu">floor</span>(total_opponent_pre_ratings <span class="sc">/</span> <span class="dv">7</span>)) <span class="co"># Divide by 7 to get the average</span></span>
+<span id="cb19-13"><a href="#cb19-13" tabindex="-1"></a>  )</span>
+<span id="cb19-14"><a href="#cb19-14" tabindex="-1"></a><span class="fu">print</span>(data_w)</span></code></pre></div>
+<pre><code>## # A tibble: 64 × 23
+## # Rowwise: 
+##    Pair  Name                Points R1_opponent_ID R2_opponent_ID R3_opponent_ID
+##    &lt;chr&gt; &lt;chr&gt;               &lt;chr&gt;  &lt;chr&gt;          &lt;chr&gt;          &lt;chr&gt;         
+##  1 1     &quot; GARY HUA        … &quot;6.0 … 39             21             18            
+##  2 2     &quot; DAKSHESH DARURI … &quot;6.0 … 63             58             4             
+##  3 3     &quot; ADITYA BAJAJ    … &quot;6.0 … 8              61             25            
+##  4 4     &quot; PATRICK H SCHILL… &quot;5.5 … 23             28             2             
+##  5 5     &quot; HANSHI ZUO      … &quot;5.5 … 45             37             12            
+##  6 6     &quot; HANSEN SONG     … &quot;5.0 … 34             29             11            
+##  7 7     &quot; GARY DEE SWATHEL… &quot;5.0 … 57             46             13            
+##  8 8     &quot; EZEKIEL HOUGHTON… &quot;5.0 … 3              32             14            
+##  9 9     &quot; STEFANO LEE     … &quot;5.0 … 25             18             59            
+## 10 10    &quot; ANVIT RAO       … &quot;5.0 … 16             19             55            
+## # ℹ 54 more rows
+## # ℹ 17 more variables: R4_opponent_ID &lt;chr&gt;, R5_opponent_ID &lt;chr&gt;,
+## #   R6_opponent_ID &lt;chr&gt;, R7_opponent_ID &lt;chr&gt;, State &lt;chr&gt;, pre_ratings &lt;dbl&gt;,
+## #   Points_2 &lt;chr&gt;, R1_2 &lt;chr&gt;, R2_2 &lt;chr&gt;, R3_2 &lt;chr&gt;, R4_2 &lt;chr&gt;, R5_2 &lt;chr&gt;,
+## #   R6_2 &lt;chr&gt;, R7_2 &lt;chr&gt;, total_opponent_pre_ratings &lt;dbl&gt;,
+## #   num_of_rounds &lt;int&gt;, average_opponent_pre_rating &lt;dbl&gt;</code></pre>
 </div>
 <div id="verify-the-complete-results-of-tranformed-data" class="section level3">
 <h3>Verify the complete results of tranformed data</h3>
 <p>Before converting the file into a CSV file, I organized the data by
 sorting the data by total points and after that pre_ratings in
 descending order.</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>complete_results <span class="ot">&lt;-</span> data_w <span class="sc">%&gt;%</span> </span>
-<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>  <span class="fu">select</span>(Name, State, Points, pre_ratings, average_opponent_pre_rating) <span class="sc">%&gt;%</span></span>
-<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(Points), <span class="fu">desc</span>(pre_ratings))</span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a>complete_results <span class="ot">&lt;-</span> data_w <span class="sc">%&gt;%</span> </span>
+<span id="cb21-2"><a href="#cb21-2" tabindex="-1"></a>  <span class="fu">select</span>(Name, State, Points, pre_ratings, average_opponent_pre_rating) <span class="sc">%&gt;%</span></span>
+<span id="cb21-3"><a href="#cb21-3" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(Points), <span class="fu">desc</span>(pre_ratings))</span></code></pre></div>
 </div>
 <div id="convert-dataset-into-a-csv-file" class="section level3">
 <h3>Convert dataset into a CSV file</h3>
 <p>I converted the complete_results data into a CSV file.</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="fu">write.csv</span>(complete_results, <span class="at">file=</span><span class="st">&#39;tournamentinfo_updatedsummary.csv&#39;</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>, <span class="at">quote =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a><span class="fu">write.csv</span>(complete_results, <span class="at">file=</span><span class="st">&#39;tournamentinfo_updatedsummary.csv&#39;</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>, <span class="at">quote =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+</div>
+<div id="view-the-results" class="section level3">
+<h3>View the results</h3>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a><span class="co"># Read the text file</span></span>
+<span id="cb23-2"><a href="#cb23-2" tabindex="-1"></a>results_data <span class="ot">&lt;-</span> <span class="fu">read_lines</span>(<span class="st">&quot;https://raw.githubusercontent.com/pujaroy280/DATA607Project1/main/tournamentinfo_updatedsummary.csv&quot;</span>)</span>
+<span id="cb23-3"><a href="#cb23-3" tabindex="-1"></a><span class="fu">print</span>(results_data)</span></code></pre></div>
+<pre><code>##  [1] &quot;Name,State,Points,pre_ratings,average_opponent_pre_rating&quot;
+##  [2] &quot; GARY HUA                        ,   ON ,6.0  ,1794,1605&quot; 
+##  [3] &quot; DAKSHESH DARURI                 ,   MI ,6.0  ,1553,1469&quot; 
+##  [4] &quot; ADITYA BAJAJ                    ,   MI ,6.0  ,1384,1563&quot; 
+##  [5] &quot; PATRICK H SCHILLING             ,   MI ,5.5  ,1716,1573&quot; 
+##  [6] &quot; HANSHI ZUO                      ,   MI ,5.5  ,1655,1500&quot; 
+##  [7] &quot; HANSEN SONG                     ,   OH ,5.0  ,1686,1518&quot; 
+##  [8] &quot; GARY DEE SWATHELL               ,   MI ,5.0  ,1649,1372&quot; 
+##  [9] &quot; EZEKIEL HOUGHTON                ,   MI ,5.0  ,1641,1468&quot; 
+## [10] &quot; STEFANO LEE                     ,   ON ,5.0  ,1411,1523&quot; 
+## [11] &quot; ANVIT RAO                       ,   MI ,5.0  ,1365,1554&quot; 
+## [12] &quot; CAMERON WILLIAM MC LEMAN        ,   MI ,4.5  ,1712,1467&quot; 
+## [13] &quot; TORRANCE HENRY JR               ,   MI ,4.5  ,1666,1497&quot; 
+## [14] &quot; KENNETH J TACK                  ,   MI ,4.5  ,1663,1291&quot; 
+## [15] &quot; BRADLEY SHAW                    ,   MI ,4.5  ,1610,1515&quot; 
+## [16] &quot; ZACHARY JAMES HOUGHTON          ,   MI ,4.5  ,1220,1483&quot; 
+## [17] &quot; RONALD GRZEGORCZYK              ,   MI ,4.0  ,1629,1498&quot; 
+## [18] &quot; MIKE NIKITIN                    ,   MI ,4.0  ,1604,989&quot;  
+## [19] &quot; DAVID SUNDEEN                   ,   MI ,4.0  ,1600,1480&quot; 
+## [20] &quot; JASON ZHENG                     ,   MI ,4.0  ,1595,1410&quot; 
+## [21] &quot; DIPANKAR ROY                    ,   MI ,4.0  ,1564,1426&quot; 
+## [22] &quot; DINH DANG BUI                   ,   ON ,4.0  ,1563,1470&quot; 
+## [23] &quot; EUGENE L MCCLURE                ,   MI ,4.0  ,1555,1114&quot; 
+## [24] &quot; ALAN BUI                        ,   ON ,4.0  ,1363,1213&quot; 
+## [25] &quot; MICHAEL R ALDRICH               ,   MI ,4.0  ,1229,1357&quot; 
+## [26] &quot; LOREN SCHWIEBERT                ,   MI ,3.5  ,1745,1363&quot; 
+## [27] &quot; CHIEDOZIE OKORIE                ,   MI ,3.5  ,1602,1125&quot; 
+## [28] &quot; MAX ZHU                         ,   ON ,3.5  ,1579,1506&quot; 
+## [29] &quot; GAURAV GIDWANI                  ,   MI ,3.5  ,1552,1047&quot; 
+## [30] &quot; GEORGE AVERY JONES              ,   ON ,3.5  ,1522,1144&quot; 
+## [31] &quot; SOFIA ADINA STANESCU-BELLU      ,   MI ,3.5  ,1507,1522&quot; 
+## [32] &quot; RISHI SHETTY                    ,   MI ,3.5  ,1494,1259&quot; 
+## [33] &quot; JADE GE                         ,   MI ,3.5  ,1449,1276&quot; 
+## [34] &quot; JOSHUA PHILIP MATHEWS           ,   ON ,3.5  ,1441,1378&quot; 
+## [35] &quot; JOSHUA DAVID LEE                ,   MI ,3.5  ,1438,1149&quot; 
+## [36] &quot; MICHAEL JEFFERY THOMAS          ,   MI ,3.5  ,1399,1375&quot; 
+## [37] &quot; SIDDHARTH JHA                   ,   MI ,3.5  ,1355,1189&quot; 
+## [38] &quot; AMIYATOSH PWNANANDAM            ,   MI ,3.5  ,980,989&quot;   
+## [39] &quot; JOEL R HENDON                   ,   MI ,3.0  ,1436,1429&quot; 
+## [40] &quot; BRIAN LIU                       ,   MI ,3.0  ,1423,1319&quot; 
+## [41] &quot; KYLE WILLIAM MURPHY             ,   MI ,3.0  ,1403,713&quot;  
+## [42] &quot; FOREST ZHANG                    ,   MI ,3.0  ,1348,1390&quot; 
+## [43] &quot; JARED GE                        ,   MI ,3.0  ,1332,1149&quot; 
+## [44] &quot; ROBERT GLEN VASEY               ,   MI ,3.0  ,1283,1106&quot; 
+## [45] &quot; DEREK YAN                       ,   MI ,3.0  ,1242,1152&quot; 
+## [46] &quot; JUSTIN D SCHILLING              ,   MI ,3.0  ,1199,1137&quot; 
+## [47] &quot; JACOB ALEXANDER LAVALLEY        ,   MI ,3.0  ,377,1357&quot;  
+## [48] &quot; DANIEL KHAIN                    ,   MI ,2.5  ,1382,968&quot;  
+## [49] &quot; ERIC WRIGHT                     ,   MI ,2.5  ,1362,1392&quot; 
+## [50] &quot; MICHAEL J MARTIN                ,   MI ,2.5  ,1291,918&quot;  
+## [51] &quot; SHIVAM JHA                      ,   MI ,2.5  ,1056,1110&quot; 
+## [52] &quot; TEJAS AYYAGARI                  ,   MI ,2.5  ,1011,1356&quot; 
+## [53] &quot; ETHAN GUO                       ,   MI ,2.5  ,935,1494&quot;  
+## [54] &quot; JOSE C YBARRA                   ,   MI ,2.0  ,1393,576&quot;  
+## [55] &quot; LARRY HODGE                     ,   MI ,2.0  ,1270,1033&quot; 
+## [56] &quot; ALEX KONG                       ,   MI ,2.0  ,1186,1205&quot; 
+## [57] &quot; MARISA RICCI                    ,   MI ,2.0  ,1153,1010&quot; 
+## [58] &quot; MICHAEL LU                      ,   MI ,2.0  ,1092,1168&quot; 
+## [59] &quot; VIRAJ MOHILE                    ,   MI ,2.0  ,917,1192&quot;  
+## [60] &quot; SEAN M MC CORMICK               ,   MI ,2.0  ,853,1130&quot;  
+## [61] &quot; JULIA SHEN                      ,   MI ,1.5  ,967,950&quot;   
+## [62] &quot; JEZZEL FARKAS                   ,   ON ,1.5  ,955,1327&quot;  
+## [63] &quot; ASHWIN BALAJI                   ,   MI ,1.0  ,1530,169&quot;  
+## [64] &quot; THOMAS JOSEPH HOSMER            ,   MI ,1.0  ,1175,964&quot;  
+## [65] &quot; BEN LI                          ,   MI ,1.0  ,1163,1263&quot;</code></pre>
 </div>
 <div id="conclusion" class="section level3">
 <h3>Conclusion</h3>
@@ -1800,7 +2417,7 @@ descending order.</p>
 transform and convert data into a CSV file.</p>
 </div>
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIlByb2plY3QgMTogRGF0YSBBbmFseXNpcyINCmF1dGhvcjogIlB1amEgUm95Ig0KZGF0ZTogImByIFN5cy5EYXRlKClgIg0Kb3V0cHV0OiBvcGVuaW50cm86OmxhYl9yZXBvcnQNCi0tLQ0KDQojIyMgSW50cm9kdWN0aW9uDQpUaGUgZ29hbCBvZiB0aGlzIHByb2plY3QgaXMgdG8gY3JlYXRlIGFuIFIgTWFya2Rvd24gZmlsZSB0aGF0IGdlbmVyYXRlcyBhIC5DU1YgZmlsZSBjb250YWluaW5nIGFsbCBvZiB0aGUgaW5mb3JtYXRpb24gZm9yIGFsbCBvZiB0aGUgY2hlc3MgcGxheWVycy4NCg0KIyMjIEltcG9ydCB0aGUgTGlicmFyaWVzDQpgYGB7ciBsb2FkLXBhY2thZ2VzLCBtZXNzYWdlPUZBTFNFfQ0KbGlicmFyeSh0aWR5dmVyc2UpDQpsaWJyYXJ5KG9wZW5pbnRybykNCmBgYA0KDQojIyMgTG9hZCB0aGUgZGF0YQ0KYGBge3J9DQojIFJlYWQgdGhlIHRleHQgZmlsZQ0KZGF0YSA8LSByZWFkX2xpbmVzKCJodHRwczovL3Jhdy5naXRodWJ1c2VyY29udGVudC5jb20vcHVqYXJveTI4MC9EQVRBNjA3UHJvamVjdDEvbWFpbi90b3VybmFtZW50aW5mby50eHQiLCBza2lwPTQpDQojcHJpbnQoZGF0YSkNCg0KYGBgDQoNCiMjIyBDbGVhbiAmIFRyYW5zZm9ybSB0aGUgRGF0YQ0KDQpJIGNsZWFuZWQgYW5kIHRyYW5zZm9ybWVkIHRoZSBkYXRhIGJ5IGRlbGV0aW5nIHRoZSBkaXZpZGVyIGxpbmVzIGFuZCBleHRyYWN0aW5nIHRoZSB2YWx1ZXMgaW50byBhIGRhdGFmcmFtZS4gSSBhbHNvIHdvcmtlZCBvbiBjYXRlZ29yaXppbmcgdGhlIGRhdGFmcmFtZSBpbnRvIGV2ZW4gYW5kIG9kZCByb3dzIGFuZCBsYXRlciBtZXJnaW5nIHRoZSBkYXRhZnJhbWVzIGJ5IGVhY2ggY29sdW1uLg0KYGBge3J9DQpkaXZpZGVycyA8LSB3aGljaChncmVwbCgiXi0iLCBkYXRhKSkNCmRhdGFfdHJhbnNmb3JtZWQgPC0gZGF0YVstZGl2aWRlcnNdDQpgYGANCg0KYGBge3J9DQpkYXRhIDwtIHJlYWQudGFibGUodGV4dCA9IGRhdGFfdHJhbnNmb3JtZWQsIHNlcCA9ICJ8IiwgY29sLm5hbWVzID0gYygiUGFpciIsICJOYW1lIiwgIlBvaW50cyIsICJSMSIsICJSMiIsICJSMyIsICJSNCIsICJSNSIsICJSNiIsICJSNyIsICJOQSIpKQ0KZGF0YSA8LSBkYXRhWzE6KGxlbmd0aChkYXRhKSAtIDEpXQ0KYGBgDQoNCmBgYHtyfQ0Kcm93XzEgPC0gZGF0YSAlPiUgZmlsdGVyKHJvd19udW1iZXIoKSAlJTIgPT0gMSkNCnJvd18yIDwtIGRhdGEgJT4lIGZpbHRlcihyb3dfbnVtYmVyKCkgJSUyID09IDApDQpkYXRhX3cgPC0gY2JpbmQocm93XzEsIHJvd18yKQ0KY29sbmFtZXMoZGF0YV93KSA9IGMoIlBhaXIiLCAiTmFtZSIsICJQb2ludHMiLCAiUjEiLCAiUjIiLCAiUjMiLCAiUjQiLCAiUjUiLCAiUjYiLCAiUjciLCAiU3RhdGUiLCAiSURfUmF0aW5nIiwgIlBvaW50c18yIiwgIlIxXzIiLCAiUjJfMiIsICJSM18yIiwgIlI0XzIiLCAiUjVfMiIsICJSNl8yIiwgIlI3XzIiKQ0KYGBgDQoNCkkgbGV2ZXJhZ2VkIFJlZ2V4IHRvIGNyZWF0ZSBuZXcgY29sdW1ucyBvZiBlYWNoIHJvdW5kIHRvIGlkZW50aWZ5IFdpbnMsIExvc3NlcyBvciBEcmF3cyBhbmQgbGlrZXdpc2UgZm9yIHRoZSBjb2x1bW4gcHJlX3JhdGluZ3MuDQpgYGB7cn0NCmRhdGFfdyA8LSBkYXRhX3cgJT4lDQogIHNlcGFyYXRlX3dpZGVyX3JlZ2V4KA0KICAgIGMoUjE6UjcpLA0KICAgIHBhdHRlcm5zID0gYygNCiAgICAgICJbQkRITFVXWF0gezIsNH0iLA0KICAgICAgIyBDcmVhdGUgbmV3IGNvbHVtbnMgYnkgZXh0cmFjdGluZyBkYXRhIHVzaW5nIFJlZ2V4IGV4cHJlc3Npb25zIHRvIGlkZW50aWZ5IFdpbnMsIExvc3NlcyBhbmQgRHJhd3MgZnJvbSBSb3VuZHMgMS03Lg0KICAgICAgb3Bwb25lbnRfSUQgPSAiKD86XFxkKyk/Ig0KICAgICksDQogICAgICMgSW5jbHVkZSBuZXcgY29sdW1zIHRvIGlkZW50aWZ5IHdoaWNoIFJvdW5kcyBpbiB0aGUgY2hlc3MgZ2FtZSBoYWQgV2lucywgTG9zc2VzIG9yIERyYXdzDQogICAgbmFtZXNfc2VwID0gIl8iDQogICkNCmBgYA0KDQpgYGB7cn0NCmRhdGFfdyA8LSBkYXRhX3cgJT4lDQogIHNlcGFyYXRlX3dpZGVyX3JlZ2V4KA0KICAgIElEX1JhdGluZywNCiAgICBwYXR0ZXJucyA9IGMoDQogICAgICAiIFxcZHs4fSAvIFI6ICsiLA0KICAgICAgcHJlX3JhdGluZ3MgPSAiXFxkKyIsDQogICAgICAiWyBQMC05XSotPiAqIiwNCiAgICAgICJcXGQrWyBQMC05XSoiDQogICAgKQ0KICApDQpgYGANCg0KYGBge3J9DQojIFJlcGxhY2UgbWlzc2luZyB2YWx1ZXMgd2l0aCBOQQ0KZGF0YV93IDwtIHJlcGxhY2UoZGF0YV93LCBkYXRhX3c9PScnLCBOQSkNCmBgYA0KDQpgYGB7cn0NCmRhdGFfdyRwcmVfcmF0aW5ncyA8LSBhcy5udW1lcmljKGRhdGFfdyRwcmVfcmF0aW5ncykNCmBgYA0KDQpgYGB7cn0NCmRhdGFfdyRQYWlyIDwtIHN0cl90cmltKGRhdGFfdyRQYWlyKQ0KYGBgDQoNCiMjIyBVcGRhdGUgdGhlIGRhdGEgYnkgQ2FsY3VsYXRpbmcgYXZlcmFnZSBwcmUtcmF0aW5nIG9mIG9wcG9uZW50cw0KDQpPbmNlIHRoZSBkYXRhIHdhcyBjbGVhbmVkIGFuZCB0cmFuc2Zvcm1lZCwgSSBjYWxjdWxhdGVkIHRoZSBhdmVyYWdlIHByZS1yYXRpbmcgb2YgZWFjaCBwbGF5ZXLigJlzIG9wcG9uZW50cy4NCmBgYHtyfQ0KcHJlX3JhdGluZ3NfdXBkYXRlZCA8LSBkYXRhX3ckcHJlX3JhdGluZ3MNCm5hbWVzKHByZV9yYXRpbmdzX3VwZGF0ZWQpIDwtIGRhdGFfdyRQYWlyDQpgYGANCg0KYGBge3J9DQpkYXRhX3cgPC0gZGF0YV93ICU+JQ0KICByb3d3aXNlICU+JSAgDQogIG11dGF0ZSgNCiAgICAgIHRvdGFsX29wcG9uZW50X3ByZV9yYXRpbmdzID0gc3VtKGFjcm9zcygNCiAgICAgICAgICAgIC5jb2xzID0gZW5kc193aXRoKCJfb3Bwb25lbnRfSUQiKSwNCiAgICAgICAgICAgIC5mbnMgPSB+IHVubmFtZShwcmVfcmF0aW5nc191cGRhdGVkWy54XSkpLA0KICAgICAgICAgIG5hLnJtID0gVFJVRSksDQogICAgICANCiAgICAgIG51bV9vZl9vcHBvbmVudHMgPSBzdW0oYWNyb3NzKA0KICAgICAgICAgICAgLmNvbHMgPSBlbmRzX3dpdGgoIl9vcHBvbmVudF9JRCIpLA0KICAgICAgICAgICAgLmZucyA9IH4gIWlzLm5hKC54KSkpLA0KICAgICAgDQogICAgICBhdmVyYWdlX29wcG9uZW50X3ByZV9yYXRpbmcgPSBpZmVsc2UobnVtX29mX29wcG9uZW50cyA9PSAwLCBOQSwgDQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgZmxvb3IodG90YWxfb3Bwb25lbnRfcHJlX3JhdGluZ3MgLyBudW1fb2Zfb3Bwb25lbnRzKSkNCiAgKQ0KYGBgDQoNCiMjIyBWZXJpZnkgdGhlIGNvbXBsZXRlIHJlc3VsdHMgb2YgdHJhbmZvcm1lZCBkYXRhDQoNCkJlZm9yZSBjb252ZXJ0aW5nIHRoZSBmaWxlIGludG8gYSBDU1YgZmlsZSwgSSBvcmdhbml6ZWQgdGhlIGRhdGEgYnkgc29ydGluZyB0aGUgZGF0YSBieSB0b3RhbCBwb2ludHMgYW5kIGFmdGVyIHRoYXQgcHJlX3JhdGluZ3MgaW4gZGVzY2VuZGluZyBvcmRlci4gDQpgYGB7cn0NCmNvbXBsZXRlX3Jlc3VsdHMgPC0gZGF0YV93ICU+JSANCiAgc2VsZWN0KE5hbWUsIFN0YXRlLCBQb2ludHMsIHByZV9yYXRpbmdzLCBhdmVyYWdlX29wcG9uZW50X3ByZV9yYXRpbmcpICU+JQ0KICBhcnJhbmdlKGRlc2MoUG9pbnRzKSwgZGVzYyhwcmVfcmF0aW5ncykpDQpgYGANCg0KIyMjIENvbnZlcnQgZGF0YXNldCBpbnRvIGEgQ1NWIGZpbGUNCkkgY29udmVydGVkIHRoZSBjb21wbGV0ZV9yZXN1bHRzIGRhdGEgaW50byBhIENTViBmaWxlLg0KYGBge3J9DQp3cml0ZS5jc3YoY29tcGxldGVfcmVzdWx0cywgZmlsZT0ndG91cm5hbWVudGluZm9fdXBkYXRlZHN1bW1hcnkuY3N2Jywgcm93Lm5hbWVzID0gRkFMU0UsIHF1b3RlID0gRkFMU0UpDQpgYGANCg0KIyMjIENvbmNsdXNpb24NCg0KVGhyb3VnaG91dCB0aGlzIHByb2plY3QsIEkgbGVhcm5lZCBob3cgdG8gbG9hZCwgZXh0cmFjdCwgY2xlYW4gYW5kIHRyYW5zZm9ybSBhbmQgY29udmVydCBkYXRhIGludG8gYSBDU1YgZmlsZS4=</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIlByb2plY3QgMTogRGF0YSBBbmFseXNpcyINCmF1dGhvcjogIlB1amEgUm95Ig0KZGF0ZTogImByIFN5cy5EYXRlKClgIg0Kb3V0cHV0OiBvcGVuaW50cm86OmxhYl9yZXBvcnQNCi0tLQ0KDQojIyMgSW50cm9kdWN0aW9uDQpUaGUgZ29hbCBvZiB0aGlzIHByb2plY3QgaXMgdG8gY3JlYXRlIGFuIFIgTWFya2Rvd24gZmlsZSB0aGF0IGdlbmVyYXRlcyBhIC5DU1YgZmlsZSBjb250YWluaW5nIGFsbCBvZiB0aGUgaW5mb3JtYXRpb24gZm9yIGFsbCBvZiB0aGUgY2hlc3MgcGxheWVycy4NCg0KIyMjIEltcG9ydCB0aGUgTGlicmFyaWVzDQpgYGB7ciBsb2FkLXBhY2thZ2VzLCBtZXNzYWdlPUZBTFNFfQ0KbGlicmFyeSh0aWR5dmVyc2UpDQpsaWJyYXJ5KG9wZW5pbnRybykNCmBgYA0KDQojIyMgTG9hZCB0aGUgZGF0YQ0KYGBge3J9DQojIFJlYWQgdGhlIHRleHQgZmlsZQ0KZGF0YSA8LSByZWFkX2xpbmVzKCJodHRwczovL3Jhdy5naXRodWJ1c2VyY29udGVudC5jb20vcHVqYXJveTI4MC9EQVRBNjA3UHJvamVjdDEvbWFpbi90b3VybmFtZW50aW5mby50eHQiLCBza2lwPTQpDQpoZWFkKGRhdGEpDQpgYGANCg0KIyMjIENsZWFuICYgVHJhbnNmb3JtIHRoZSBEYXRhDQoNCkkgY2xlYW5lZCBhbmQgdHJhbnNmb3JtZWQgdGhlIGRhdGEgYnkgZGVsZXRpbmcgdGhlIGRpdmlkZXIgbGluZXMgYW5kIGV4dHJhY3RpbmcgdGhlIHZhbHVlcyBpbnRvIGEgZGF0YWZyYW1lLiBJIGFsc28gd29ya2VkIG9uIGNhdGVnb3JpemluZyB0aGUgZGF0YWZyYW1lIGludG8gZXZlbiBhbmQgb2RkIHJvd3MgYW5kIGxhdGVyIG1lcmdpbmcgdGhlIGRhdGFmcmFtZXMgYnkgZWFjaCBjb2x1bW4uDQpgYGB7cn0NCmRpdmlkZXJzIDwtIHdoaWNoKGdyZXBsKCJeLSIsIGRhdGEpKQ0KZGF0YV90cmFuc2Zvcm1lZCA8LSBkYXRhWy1kaXZpZGVyc10NCmBgYA0KDQpgYGB7cn0NCmRhdGEgPC0gcmVhZC50YWJsZSh0ZXh0ID0gZGF0YV90cmFuc2Zvcm1lZCwgc2VwID0gInwiLCBjb2wubmFtZXMgPSBjKCJQYWlyIiwgIk5hbWUiLCAiUG9pbnRzIiwgIlIxIiwgIlIyIiwgIlIzIiwgIlI0IiwgIlI1IiwgIlI2IiwgIlI3IiwgIk5BIikpDQpkYXRhIDwtIGRhdGFbMToobGVuZ3RoKGRhdGEpIC0gMSldDQpwcmludChkYXRhKQ0KYGBgDQoNCmBgYHtyfQ0Kcm93XzEgPC0gZGF0YSAlPiUgZmlsdGVyKHJvd19udW1iZXIoKSAlJTIgPT0gMSkNCnJvd18yIDwtIGRhdGEgJT4lIGZpbHRlcihyb3dfbnVtYmVyKCkgJSUyID09IDApDQpkYXRhX3cgPC0gY2JpbmQocm93XzEsIHJvd18yKQ0KY29sbmFtZXMoZGF0YV93KSA9IGMoIlBhaXIiLCAiTmFtZSIsICJQb2ludHMiLCAiUjEiLCAiUjIiLCAiUjMiLCAiUjQiLCAiUjUiLCAiUjYiLCAiUjciLCAiU3RhdGUiLCAiSURfUmF0aW5nIiwgIlBvaW50c18yIiwgIlIxXzIiLCAiUjJfMiIsICJSM18yIiwgIlI0XzIiLCAiUjVfMiIsICJSNl8yIiwgIlI3XzIiKQ0KcHJpbnQoZGF0YV93KQ0KYGBgDQoNCkkgbGV2ZXJhZ2VkIFJlZ2V4IHRvIGNyZWF0ZSBuZXcgY29sdW1ucyBvZiBlYWNoIHJvdW5kIHRvIGlkZW50aWZ5IFdpbnMsIExvc3NlcyBvciBEcmF3cyBhbmQgbGlrZXdpc2UgZm9yIHRoZSBjb2x1bW4gcHJlX3JhdGluZ3MuDQpgYGB7cn0NCmRhdGFfdyA8LSBkYXRhX3cgJT4lDQogIHNlcGFyYXRlX3dpZGVyX3JlZ2V4KA0KICAgIGMoUjE6UjcpLA0KICAgIHBhdHRlcm5zID0gYygNCiAgICAgICJbQkRITFVXWF0gezIsNH0iLA0KICAgICAgIyBDcmVhdGUgbmV3IGNvbHVtbnMgYnkgZXh0cmFjdGluZyBkYXRhIHVzaW5nIFJlZ2V4IGV4cHJlc3Npb25zIHRvIGlkZW50aWZ5IFdpbnMsIExvc3NlcyBhbmQgRHJhd3MgZnJvbSBSb3VuZHMgMS03Lg0KICAgICAgb3Bwb25lbnRfSUQgPSAiKD86XFxkKyk/Ig0KICAgICksDQogICAgICMgSW5jbHVkZSBuZXcgY29sdW1zIHRvIGlkZW50aWZ5IHdoaWNoIFJvdW5kcyBpbiB0aGUgY2hlc3MgZ2FtZSBoYWQgV2lucywgTG9zc2VzIG9yIERyYXdzDQogICAgbmFtZXNfc2VwID0gIl8iDQogICkNCnByaW50KGRhdGFfdykNCmBgYA0KDQpgYGB7cn0NCmRhdGFfdyA8LSBkYXRhX3cgJT4lDQogIHNlcGFyYXRlX3dpZGVyX3JlZ2V4KA0KICAgIElEX1JhdGluZywNCiAgICBwYXR0ZXJucyA9IGMoDQogICAgICAiIFxcZHs4fSAvIFI6ICsiLA0KICAgICAgcHJlX3JhdGluZ3MgPSAiXFxkKyIsDQogICAgICAiWyBQMC05XSotPiAqIiwNCiAgICAgICJcXGQrWyBQMC05XSoiDQogICAgKQ0KICApDQpwcmludChkYXRhX3cpDQpgYGANCg0KYGBge3J9DQojIFJlcGxhY2UgbWlzc2luZyB2YWx1ZXMgd2l0aCBOQQ0KZGF0YV93IDwtIHJlcGxhY2UoZGF0YV93LCBkYXRhX3c9PScnLCBOQSkNCnByaW50KGRhdGFfdykNCmBgYA0KDQpgYGB7cn0NCmRhdGFfdyRwcmVfcmF0aW5ncyA8LSBhcy5udW1lcmljKGRhdGFfdyRwcmVfcmF0aW5ncykNCmBgYA0KDQpgYGB7cn0NCmRhdGFfdyRQYWlyIDwtIHN0cl90cmltKGRhdGFfdyRQYWlyKQ0KYGBgDQoNCiMjIyBVcGRhdGUgdGhlIGRhdGEgYnkgQ2FsY3VsYXRpbmcgYXZlcmFnZSBwcmUtcmF0aW5nIG9mIG9wcG9uZW50cw0KDQpPbmNlIHRoZSBkYXRhIHdhcyBjbGVhbmVkIGFuZCB0cmFuc2Zvcm1lZCwgSSBjYWxjdWxhdGVkIHRoZSBhdmVyYWdlIHByZS1yYXRpbmcgb2YgZWFjaCBwbGF5ZXLigJlzIG9wcG9uZW50cy4NCmBgYHtyfQ0KcHJlX3JhdGluZ3NfdXBkYXRlZCA8LSBkYXRhX3ckcHJlX3JhdGluZ3MNCm5hbWVzKHByZV9yYXRpbmdzX3VwZGF0ZWQpIDwtIGRhdGFfdyRQYWlyDQpwcmludChwcmVfcmF0aW5nc191cGRhdGVkKQ0KYGBgDQoNCmBgYHtyfQ0KZGF0YV93IDwtIGRhdGFfdyAlPiUNCiAgcm93d2lzZSAlPiUgIA0KICBtdXRhdGUoDQogICAgICB0b3RhbF9vcHBvbmVudF9wcmVfcmF0aW5ncyA9IHN1bShhY3Jvc3MoDQogICAgICAgICAgICAuY29scyA9IGVuZHNfd2l0aCgiX29wcG9uZW50X0lEIiksDQogICAgICAgICAgICAuZm5zID0gfiB1bm5hbWUocHJlX3JhdGluZ3NfdXBkYXRlZFsueF0pKSwNCiAgICAgICAgICBuYS5ybSA9IFRSVUUpLA0KICAgICAgDQogICAgICBudW1fb2Zfcm91bmRzID0gbmNvbChzZWxlY3QoZGF0YV93LCBzdGFydHNfd2l0aCgiUiIpKSksICMgQ291bnQgdGhlIG51bWJlciBvZiByb3VuZHMNCiAgICAgIA0KICAgICAgYXZlcmFnZV9vcHBvbmVudF9wcmVfcmF0aW5nID0gaWZlbHNlKG51bV9vZl9yb3VuZHMgPT0gMCwgTkEsIA0KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGZsb29yKHRvdGFsX29wcG9uZW50X3ByZV9yYXRpbmdzIC8gNykpICMgRGl2aWRlIGJ5IDcgdG8gZ2V0IHRoZSBhdmVyYWdlDQogICkNCnByaW50KGRhdGFfdykNCmBgYA0KDQojIyMgVmVyaWZ5IHRoZSBjb21wbGV0ZSByZXN1bHRzIG9mIHRyYW5mb3JtZWQgZGF0YQ0KDQpCZWZvcmUgY29udmVydGluZyB0aGUgZmlsZSBpbnRvIGEgQ1NWIGZpbGUsIEkgb3JnYW5pemVkIHRoZSBkYXRhIGJ5IHNvcnRpbmcgdGhlIGRhdGEgYnkgdG90YWwgcG9pbnRzIGFuZCBhZnRlciB0aGF0IHByZV9yYXRpbmdzIGluIGRlc2NlbmRpbmcgb3JkZXIuIA0KYGBge3J9DQpjb21wbGV0ZV9yZXN1bHRzIDwtIGRhdGFfdyAlPiUgDQogIHNlbGVjdChOYW1lLCBTdGF0ZSwgUG9pbnRzLCBwcmVfcmF0aW5ncywgYXZlcmFnZV9vcHBvbmVudF9wcmVfcmF0aW5nKSAlPiUNCiAgYXJyYW5nZShkZXNjKFBvaW50cyksIGRlc2MocHJlX3JhdGluZ3MpKQ0KYGBgDQoNCiMjIyBDb252ZXJ0IGRhdGFzZXQgaW50byBhIENTViBmaWxlDQpJIGNvbnZlcnRlZCB0aGUgY29tcGxldGVfcmVzdWx0cyBkYXRhIGludG8gYSBDU1YgZmlsZS4NCmBgYHtyfQ0Kd3JpdGUuY3N2KGNvbXBsZXRlX3Jlc3VsdHMsIGZpbGU9J3RvdXJuYW1lbnRpbmZvX3VwZGF0ZWRzdW1tYXJ5LmNzdicsIHJvdy5uYW1lcyA9IEZBTFNFLCBxdW90ZSA9IEZBTFNFKQ0KYGBgDQoNCiMjIyBWaWV3IHRoZSByZXN1bHRzDQpgYGB7cn0NCiMgUmVhZCB0aGUgdGV4dCBmaWxlDQpyZXN1bHRzX2RhdGEgPC0gcmVhZF9saW5lcygiaHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL3B1amFyb3kyODAvREFUQTYwN1Byb2plY3QxL21haW4vdG91cm5hbWVudGluZm9fdXBkYXRlZHN1bW1hcnkuY3N2IikNCnByaW50KHJlc3VsdHNfZGF0YSkNCmBgYA0KDQojIyMgQ29uY2x1c2lvbg0KDQpUaHJvdWdob3V0IHRoaXMgcHJvamVjdCwgSSBsZWFybmVkIGhvdyB0byBsb2FkLCBleHRyYWN0LCBjbGVhbiBhbmQgdHJhbnNmb3JtIGFuZCBjb252ZXJ0IGRhdGEgaW50byBhIENTViBmaWxlLg==</div>
 
 
 </div>
